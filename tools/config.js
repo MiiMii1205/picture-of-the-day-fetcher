@@ -71,8 +71,27 @@ function InitConfig() {
         .then(d => { Object.assign(config, ini.parse(d)); }, dealWithError)
         .then(() => fs.readFileAsync(userConfigFilePath, 'utf8'))
         .then(d => { Object.assign(config, ini.parse(d)); }, dealWithError)
+
         .then(() => {
 
+            // Parsing Configs
+            config.ScreenWidth = parseInt(config.ScreenWidth);
+            config.ScreenHeight = parseInt(config.ScreenHeight);
+            config.UseVarietyConfig = config.UseVarietyConfig.toLowerCase() === "true";
+            config.AutoScreenResolution = config.AutoScreenResolution.toLowerCase() === "true";
+            config.OnlyLandscape = config.OnlyLandscape.toLowerCase() === "true";
+            config.UseMinimumSize = config.UseMinimumSize.toLowerCase() === "true";
+            config.NationalGeographic.AutoDownloadSize = config.NationalGeographic.AutoDownloadSize.toLowerCase() === "true";
+
+            config.DirSizeQuota = parseInt(config.DirSizeQuota);
+            config.PicMinimumSizePercents = parseInt(config.PicMinimumSizePercents);
+            config.NationalGeographic.DownloadSize = parseInt(config.NationalGeographic.DownloadSize);
+            
+        })
+
+        .then(() => {
+            console.log(config);
+            
             // Trying to fetch the user's screen resolution
             if (config.AutoScreenResolution) {
 
@@ -81,8 +100,8 @@ function InitConfig() {
                     // They're on X11
                     return exec("xrandr | awk '/primary/{print $4}'").then((stdout, stderr) => {
                         let [width, height] = stdout.split("+")[0].split("x");
-                        config.ScreenWidth = width;
-                        config.ScreenWidth = height;
+                        config.ScreenWidth = Number.parseInt(width);
+                        config.ScreenWidth = Number.parseInt(height);
                     });
 
                 } else if (process.env.XDG_SESSION_TYPE === "wayland") {
@@ -95,16 +114,16 @@ function InitConfig() {
                             // let's use swaymsg get_output
                             return exec("swaymsg -p -t get_outputs | awk '/Current mode/{print $3}'").then((stdout, stderr) => {
                                 let [width, height] = stdout.split("x");
-                                config.ScreenWidth = width;
-                                config.ScreenWidth = height;
+                                config.ScreenWidth = Number.parseInt(width);
+                                config.ScreenWidth = Number.parseInt(height);
                             });
 
                         default:
                             // They're probably have x installed anyways...
                             return exec("xrandr | awk '/primary/{print $4}'").then((stdout, stderr) => {
                                 let [width, height] = stdout.split("+")[0].split("x");
-                                config.ScreenWidth = width;
-                                config.ScreenWidth = height;
+                                config.ScreenWidth = Number.parseInt(width);
+                                config.ScreenWidth = Number.parseInt(height);
                             });
 
                     }
@@ -147,19 +166,19 @@ function InitConfig() {
                 return fs.readFileAsync(varietyConfigFilePath, 'utf8')
                     .then(d => {
                         let varietyConfigs = ini.parse(d);
-                        config.DownloadPath = varietyConfigs.download_folder.replace(/^~/ig, os.homedir());
+                        config.DownloadPath =varietyConfigs.download_folder.replace(/^~/ig, os.homedir());
 
-                        if (varietyConfigs.quota_enable) {
-                            config.DirSizeQuota = varietyConfigs.quota_size * 1000000;
+                        if (varietyConfigs.quota_enabled.toLowerCase() === "true") {
+                            config.DirSizeQuota =  parseInt(varietyConfigs.quota_size) * 1000000;
                         }
 
-                        config.UseMinimumSize = varietyConfigs.min_size_enabled
+                        config.UseMinimumSize = (varietyConfigs.min_size_enabled.toLowerCase() === "true")
 
                         if (config.UseMinimumSize) {
-                            config.PicMinimumSizePercents = 50;
+                            config.PicMinimumSizePercents = parseInt(varietyConfigs.min_size);
                         }
 
-                        config.OnlyLandscape = varietyConfigs.use_landscape_enabled;
+                        config.OnlyLandscape = varietyConfigs.use_landscape_enabled.toLowerCase() === "true";
 
                     }, dealWithError);
             }
