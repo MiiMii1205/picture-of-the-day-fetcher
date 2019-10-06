@@ -1,0 +1,24 @@
+{
+  "name": "picture-of-the-day-fetcher",
+  "version": "1.0.0",
+  "description": "a picture fetcher",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/pkg index.js --targets host --output ./dist/picture-of-the-day-fetcher && mv ./dist/picture-of-the-day-fetcher /bin && cp ./etc/picture-of-the-day-fetcher.conf /etc/picture-of-the-day-fetcher.conf"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "case": "^1.6.2",
+    "cheerio": "^1.0.0-rc.3",
+    "du": "^1.0.0",
+    "image-size": "^0.7.5",
+    "ini": "^1.3.5",
+    "moment": "^2.24.0",
+    "pkg": "^4.4.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4"
+  }
+}

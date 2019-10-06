@@ -1,0 +1,10 @@
+[Unit]
+Description=picture-of-the-day-fetcher
+
+[Service]
+ExecStart=/bin/picture-of-the-day-fetcher
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=user.target
